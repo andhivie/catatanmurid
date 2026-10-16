@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="bg-white rounded-2xl shadow p-6 md:p-8 max-w-xl mx-auto">
+  <h1 class="text-2xl font-bold text-blue-900 mb-6">📤 Upload Rapor Siswa</h1>
+  
+  {% if error %}
+  <div class="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">{{ error }}</div>
+  {% endif %}
+  
+  <form id="uploadForm" method="POST" enctype="multipart/form-data" class="space-y-5">
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Pilih file rapor (PDF/JPG/PNG) – bisa lebih dari satu</label>
+      <input type="file" name="files" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" multiple class="hidden">
+      
+      <div id="dropZone" class="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center cursor-pointer hover:bg-blue-50 transition">
+        <p class="text-gray-500">📂 Klik atau seret file ke sini</p>
+        <p class="text-xs text-gray-400 mt-1">Format: PDF, JPG, PNG (maks. 10 MB total)</p>
+      </div>
+      
+      <div id="fileList" class="mt-4 space-y-2"></div>
+    </div>
+    
+    <button type="submit" id="uploadBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition flex items-center justify-center">
+      <span id="btnText">Proses & Analisis AI</span>
+      <span id="spinner" class="hidden ml-2">
+        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+      </span>
+    </button>
+  </form>
+</div>
+
+<script>
+  const fileInput = document.getElementById('fileInput');
+  const dropZone = document.getElementById('dropZone');
+  const fileListDiv = document.getElementById('fileList');
+  const uploadForm = document.getElementById('uploadForm');
+  let selectedFiles = [];
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('bg-blue-50'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('bg-blue-50'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('bg-blue-50');
+    addFiles(Array.from(e.dataTransfer.files));
+  });
+  fileInput.addEventListener('change', (e) => {
+    addFiles(Array.from(e.target.files));
+    fileInput.value = '';
+  });
+
+  function addFiles(newFiles) {
+    newFiles.forEach(file => {
+      if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+        selectedFiles.push(file);
+      }
+    });
+    renderFileList();
+  }
+
+  function removeFile(index) { selectedFiles.splice(index, 1); renderFileList(); }
+
+  function renderFileList() {
+    fileListDiv.innerHTML = '';
+    if (selectedFiles.length === 0) {
+      fileListDiv.innerHTML = '<p class="text-sm text-gray-400 italic">Belum ada file dipilih</p>';
+      return;
+    }
+    selectedFiles.forEach((file, idx) => {
+      const div = document.createElement('div');
+      div.className = 'flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 text-sm';
+      div.innerHTML = `
+        <div class="flex items-center space-x-3 truncate">
+          <span class="text-blue-600 text-lg">📄</span>
+          <div>
+            <p class="font-medium text-gray-700 truncate max-w-[200px]">${file.name}</p>
+            <p class="text-xs text-gray-500">${formatFileSize(file.size)}</p>
+          </div>
+        </div>
+        <button type="button" class="text-red-500 hover:text-red-700 ml-2" onclick="removeFile(${idx})">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>`;
+      fileListDiv.appendChild(div);
+    });
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  }
+
+  uploadForm.addEventListener('submit', function(e) {
+    if (selectedFiles.length === 0) {
+      e.preventDefault();
+      alert('Pilih minimal satu file.');
+      return;
+    }
+    const dt = new DataTransfer();
+    selectedFiles.forEach(file => dt.items.add(file));
+    fileInput.files = dt.files;
+    document.getElementById('btnText').classList.add('hidden');
+    document.getElementById('spinner').classList.remove('hidden');
+    document.getElementById('uploadBtn').disabled = true;
+  });
+</script>
+{% endblock %}

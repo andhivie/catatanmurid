@@ -1,0 +1,6 @@
+flask
+pymupdf
+pytesseract
+Pillow
+weasyprint
+requests

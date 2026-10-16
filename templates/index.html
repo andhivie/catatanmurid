@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="bg-white rounded-2xl shadow p-6 md:p-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-blue-900">📋 Daftar Laporan Siswa</h1>
+    {% if reports %}
+    <a href="/download-all" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-full transition">⬇ Unduh Semua (ZIP)</a>
+    {% endif %}
+  </div>
+  
+  {% if reports %}
+  <div class="overflow-x-auto">
+    <table class="w-full table-auto border-collapse">
+      <thead>
+        <tr class="border-b-2 border-blue-200 text-left text-blue-800">
+          <th class="py-3 px-4">Nama Siswa</th>
+          <th class="py-3 px-4">Tanggal</th>
+          <th class="py-3 px-4">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for report in reports %}
+        <tr class="border-b border-gray-100 hover:bg-blue-50">
+          <td class="py-3 px-4 font-medium">{{ report.nama }}</td>
+          <td class="py-3 px-4 text-gray-600">{{ report.tanggal }}</td>
+          <td class="py-3 px-4">
+            <a href="/report/{{ report.id }}" class="text-blue-600 hover:text-blue-800 mr-2 text-sm">Lihat</a>
+            <a href="/download/{{ report.id }}" class="text-green-600 hover:text-green-800 mr-2 text-sm">Unduh PDF</a>
+            <form action="/delete-report/{{ report.id }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
+              <button type="submit" class="text-red-500 hover:text-red-700 text-sm">Hapus</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-12 text-gray-500">
+    <p class="text-xl">Belum ada laporan.</p>
+    <p class="mt-2">Klik <strong>"Buat Laporan Baru"</strong> untuk memulai.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

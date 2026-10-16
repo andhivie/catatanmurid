@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="bg-white rounded-2xl shadow p-6 md:p-8 max-w-3xl mx-auto">
+  <div class="text-center mb-8">
+    <h1 class="text-3xl font-bold text-blue-900">Laporan Perkembangan Siswa</h1>
+    <p class="text-xl font-medium text-blue-700 mt-2">{{ report.nama }}</p>
+  </div>
+  <div class="prose max-w-none text-gray-800 leading-relaxed whitespace-pre-line text-justify mb-8">
+    {{ report.deskripsi_lengkap }}
+  </div>
+
+  <div class="border-t pt-6 flex flex-wrap gap-3 items-center justify-between">
+    <a href="/download/{{ report.id }}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-medium transition">📥 Unduh Laporan (PDF)</a>
+    <div class="flex gap-3">
+      <button onclick="toggleEdit()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm">✏️ Edit Deskripsi</button>
+      <a href="/" class="text-blue-600 hover:text-blue-800 text-sm self-center">← Kembali ke daftar</a>
+    </div>
+  </div>
+
+  <div id="editForm" class="mt-6 hidden">
+    <form action="/edit-report/{{ report.id }}" method="POST">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Perilaku (max 1000 karakter)</label>
+      <textarea name="deskripsi" maxlength="1000" rows="5" required
+                class="w-full border border-gray-300 rounded-lg p-3 mb-3 text-sm">{{ report.deskripsi_perilaku }}</textarea>
+      <div class="flex gap-3">
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium">🔄 Generate Ulang</button>
+        <button type="button" onclick="toggleEdit()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Batal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function toggleEdit() {
+    const form = document.getElementById('editForm');
+    form.classList.toggle('hidden');
+  }
+</script>
+{% endblock %}
