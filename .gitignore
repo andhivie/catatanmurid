@@ -3,4 +3,4 @@ __pycache__/
 *.pyc
 uploads/
 data/*.json
-.env
+.envgit init
